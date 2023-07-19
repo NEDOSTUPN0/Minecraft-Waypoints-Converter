@@ -32,4 +32,34 @@ def convert_voxelmap_to_xaero(output_folder: str):
                         f.write('#\n#waypoint:name:initials:x:y:z:color:disabled:type:set:rotate_on_tp:tp_yaw:visibility_type:destination\n#\n')
                     f.write(f'waypoint:{name}::{x}:{y}:{z}:0:false:0:gui.xaero_default:false:0:0:false\n')
 
-convert_voxelmap_to_xaero('output_folder')
+def convert_xaero_to_voxelmap(output_folder: str):
+    os.makedirs(output_folder, exist_ok=True)
+    xaero_files = glob.glob('**/mw$default_1.txt', recursive=True)
+    if len(xaero_files) == 0:
+        print('Внимание: в папке не найдено ни одного файла с именем mw$default_1.txt. Продолжение невозможно.')
+        return
+    dimensions = {'dim%-1': 'the_nether', 'dim%0': 'overworld', 'dim%1': 'the_end'}
+    output_file = os.path.join(output_folder, 'converted.points')
+    with open(output_file, 'w') as f:
+        f.write('subworlds:\noldNorthWorlds:\nseeds:\n')
+        for xaero_file in xaero_files:
+            dimension_folder = os.path.dirname(xaero_file)
+            dimension = os.path.basename(dimension_folder)
+            if dimension in dimensions:
+                dimension = dimensions[dimension]
+                with open(xaero_file, 'r') as f2:
+                    lines = f2.readlines()
+                for line in lines:
+                    if line.startswith('waypoint:'):
+                        parts = line.split(':')
+                        name = parts[1]
+                        x = parts[3]
+                        y = parts[4]
+                        z = parts[5]
+                        f.write(f'name:{name},x:{x},z:{z},y:{y},enabled:true,red:0.058490813,green:0.89992464,blue:0.60238135,suffix:,world:,dimensions:{dimension}#\n')
+
+direction = input('Введите 1 для конвертации из VoxelMap в Xaero\'s Minimap или 2 для конвертации из Xaero\'s Minimap в VoxelMap (по умолчанию 1): ')
+if direction == '2':
+    convert_xaero_to_voxelmap('output_folder')
+else:
+    convert_voxelmap_to_xaero('output_folder')
