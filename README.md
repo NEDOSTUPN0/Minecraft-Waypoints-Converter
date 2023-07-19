@@ -1,6 +1,6 @@
 # Minecraft Waypoints Converter
 
-This Python script allows you to convert waypoints from the VoxelMap format to the Xaero's Minimap format.
+This Python script allows you to convert waypoints from VoxelMap format to Xaero's Minimap format and vice versa
 
 ## Usage
 
