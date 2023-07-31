@@ -18,9 +18,9 @@ def convert_voxelmap_to_xaero(output_folder: str):
         if line.startswith('name:'):
             parts = line.split(',')
             name = parts[0].split(':')[1]
-            x = parts[1].split(':')[1]
-            z = parts[2].split(':')[1]
-            y = parts[3].split(':')[1]
+            x = int(parts[1].split(':')[1])
+            z = int(parts[2].split(':')[1])
+            y = int(parts[3].split(':')[1])
             dimension = parts[-1].split(':')[-1].strip().replace('#', '')
             if dimension in dimensions:
                 dimension = dimensions[dimension]
@@ -30,6 +30,9 @@ def convert_voxelmap_to_xaero(output_folder: str):
                 with open(output_file, 'a') as f:
                     if f.tell() == 0:
                         f.write('#\n#waypoint:name:initials:x:y:z:color:disabled:type:set:rotate_on_tp:tp_yaw:visibility_type:destination\n#\n')
+                    if dimension == 'dim%-1':
+                        x //= 8
+                        z //= 8
                     f.write(f'waypoint:{name}::{x}:{y}:{z}:0:false:0:gui.xaero_default:false:0:0:false\n')
 
 def convert_xaero_to_voxelmap(output_folder: str):
@@ -53,9 +56,12 @@ def convert_xaero_to_voxelmap(output_folder: str):
                     if line.startswith('waypoint:'):
                         parts = line.split(':')
                         name = parts[1]
-                        x = parts[3]
-                        y = parts[4]
-                        z = parts[5]
+                        x = int(parts[3])
+                        y = int(parts[4])
+                        z = int(parts[5])
+                        if dimension == 'the_nether':
+                            x *= 8
+                            z *= 8
                         f.write(f'name:{name},x:{x},z:{z},y:{y},enabled:true,red:0.058490813,green:0.89992464,blue:0.60238135,suffix:,world:,dimensions:{dimension}#\n')
 
 direction = input('Введите 1 для конвертации из VoxelMap в Xaero\'s Minimap или 2 для конвертации из Xaero\'s Minimap в VoxelMap (по умолчанию 1): ')
